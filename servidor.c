@@ -26,7 +26,7 @@ struct udev_device* obtener_hijo(struct udev* udev,struct udev_device* padre,con
 	return hijo;
 }
 
-static void enumerar_disp_alm_masivo(struct udev* udev)
+static char* enumerar_disp_alm_masivo(struct udev* udev)
 {
 	struct udev_enumerate* enumerar = udev_enumerate_new(udev);
 
@@ -39,6 +39,7 @@ static void enumerar_disp_alm_masivo(struct udev* udev)
 	struct udev_list_entry *dispositivos = udev_enumerate_get_list_entry(enumerar);
 	struct udev_list_entry *entrada;
 
+	char * devnode = "";
 	//Recorremos la lista obtenida
 	udev_list_entry_foreach(entrada, dispositivos) {
 		const char* ruta = udev_list_entry_get_name(entrada);
@@ -52,7 +53,7 @@ static void enumerar_disp_alm_masivo(struct udev* udev)
 
 		if (block) {
 			printf("block = %s, usb = %s:%s, scsi = %s\n",
-				udev_device_get_devnode(block),
+				devnode = udev_device_get_devnode(block),
 				udev_device_get_sysattr_value(usb, "idVendor"),
 				udev_device_get_sysattr_value(usb, "idProduct"),
 				udev_device_get_sysattr_value(scsi, "vendor"));
@@ -70,6 +71,7 @@ static void enumerar_disp_alm_masivo(struct udev* udev)
 	}
 
 	udev_enumerate_unref(enumerar);
+	return devnode;
 }
 
 int main(int argc, char** argv) {
