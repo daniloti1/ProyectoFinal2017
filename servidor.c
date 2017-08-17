@@ -6,19 +6,19 @@
 
 struct udev_device* obtener_hijo(struct udev* udev,struct udev_device* padre,const char* subsistema)
 {
-	struct udev_device* hijo =NULL;
-	struct udev_enumerate *enumerar=udev_enumerate_new(udev);
+	struct udev_device* hijo = NULL;
+	struct udev_enumerate *enumerar = udev_enumerate_new(udev);
 	
 	udev_enumerate_add_match_parent(enumerar,padre);
-	udev_enumerate_add_match_subsystem(enumerar,subsitema);
+	udev_enumerate_add_match_subsystem(enumerar,subsistema);
 	udev_enumerate_scan_devices(enumerar);
 
-	struct udev_list_etry *dispositivos=udev_enumerate_get_list_entry(enumerar);
-	struct udev_list_etry *entrada;
+	struct udev_list_entry *dispositivos = udev_enumerate_get_list_entry(enumerar);
+	struct udev_list_entry *entrada;
 	
-	udev_list_entry_foreach(entrada,dispositivos);{
+	udev_list_entry_foreach(entrada,dispositivos) {
 		const char *ruta=udev_list_entry_get_name(entrada);
-		hijo=udev_device_new_from_syspath(udev,ruta);
+		hijo = udev_device_new_from_syspath(udev,ruta);
 		break;
 	}
 
@@ -41,12 +41,12 @@ static void enumerar_disp_alm_masivo(struct udev* udev)
 
 	//Recorremos la lista obtenida
 	udev_list_entry_foreach(entrada, dispositivos) {
-		const char* ruta = undev_list_entry_get_name(entrada);
+		const char* ruta = udev_list_entry_get_name(entrada);
 		struct udev_device* scsi = udev_device_new_from_syspath(udev, ruta);
 
 		//Obtenemos la informacion pertinente del dispositivo
-		struct udev_device* lock = obtener_hijo(udev, scsi, "block");
-		struct udev_device* scsi_disk = obtenerhijo(udev, scsi, "scsi_disk");
+		struct udev_device* block = obtener_hijo(udev, scsi, "block");
+		struct udev_device* scsi_disk = obtener_hijo(udev, scsi, "scsi_disk");
 
 		struct udev_device* usb = udev_device_get_parent_with_subsystem_devtype(scsi, "usb", "usb_device");
 
@@ -70,4 +70,23 @@ static void enumerar_disp_alm_masivo(struct udev* udev)
 	}
 
 	udev_enumerate_unref(enumerar);
+}
+
+int main(int argc, char** argv) {
+	struct udev *udev = udev_new();
+
+	/*
+	struct udev_enumerate *enumerate;
+	struct udev_list_entry *devices, *dev_list_entry;
+	struct udev_device *dev;
+
+   	struct udev_monitor *mon;
+	int fd;
+	*/
+
+	enumerar_disp_alm_masivo(udev);
+
+
+
+
 }
