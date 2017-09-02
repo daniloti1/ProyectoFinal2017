@@ -8,7 +8,14 @@
 #include <mntent.h>
 #include <libudev.h>
 #include <unistd.h>
-
+#include <errno.h>
+#include <stdlib.h>
+#include <syslog.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <libudev.h>
+#include <stdio.h>
+#include <mntent.h>
 
 struct udev_device* obtener_hijo(struct udev* udev,struct udev_device* padre,const char* subsistema){
 	struct udev_device* hijo = NULL;
@@ -31,7 +38,26 @@ struct udev_device* obtener_hijo(struct udev* udev,struct udev_device* padre,con
 	return hijo;
 }
 
-static void enumerar_disp_alm_masivo(struct udev* udev,int archivo){
+const char* direccion(const char *dir){
+	FILE *fp;
+	struct mntent *mn;
+	
+	fp = setmntent("/etc/mtab", "r");
+	if (fp == NULL) {
+		printf("Fallo apertura del archivo\n");
+		exit(1);
+	}
+	while ((mn = getmntent(fp)) != NULL){
+		if(strstr(mn->mnt_fsname,dir)>0){
+			endmntent(fp);
+			return mn->mnt_dir;
+		}
+	}
+	endmntent(fp);
+	return "no se ha montado el usb";
+}
+
+void enumerar_disp_alm_masivo(struct udev* udev,int archivo){
 	printf("hola xD");
 	char * buf = (char *)malloc(sizeof(char)*100);
 	memset (buf,0,sizeof(char)*100);
@@ -49,6 +75,7 @@ static void enumerar_disp_alm_masivo(struct udev* udev,int archivo){
 
 	//char * devnode = "";
 	//Recorremos la lista obtenida
+	int n=0;
 	udev_list_entry_foreach(entrada, dispositivos) {
 		const char* ruta = udev_list_entry_get_name(entrada);
 		struct udev_device* scsi = udev_device_new_from_syspath(udev, ruta);
@@ -59,20 +86,15 @@ static void enumerar_disp_alm_masivo(struct udev* udev,int archivo){
 
 		struct udev_device* usb = udev_device_get_parent_with_subsystem_devtype(scsi, "usb", "usb_device");
 
-		if (block) {
-			printf("block = %s, usb = %s:%s, scsi = %s\n",
-				udev_device_get_devnode(block),
+		if (block && scsi_disk && usb) {
+			const char *node=udev_device_get_devnode(block);
+			int n=sprintf(buf, "nodo = %s,El punto de montaje = %s, id(idVendor:idProduct)= %s:%s, scsi = %s\n",
+				node,
+				direccion(node),
 				udev_device_get_sysattr_value(usb, "idVendor"),
 				udev_device_get_sysattr_value(usb, "idProduct"),
 				udev_device_get_sysattr_value(scsi, "vendor"));
-				buf[0]="block = %s, usb = %s:%s, scsi = %s\n",
-				udev_device_get_devnode(block),
-				udev_device_get_sysattr_value(usb, "idVendor"),
-				udev_device_get_sysattr_value(usb, "idProduct"),
-				udev_device_get_sysattr_value(scsi, "vendor");
-				fwrite(buf, strlen(buf),1,archivo);
-				
-				memset (buf,0,sizeof(char)*100);
+			write (archivo, buf, n);
 		}
 
 		if (block) {
@@ -82,7 +104,9 @@ static void enumerar_disp_alm_masivo(struct udev* udev,int archivo){
 		if (scsi_disk) {
 			udev_device_unref(scsi_disk);
 		}
-
+		if(n==0){
+			write (archivo, "no hay dispositivos conectado\n", 30);
+		}
 		udev_device_unref(scsi);
 	}
 
@@ -94,10 +118,7 @@ static void enumerar_disp_alm_masivo(struct udev* udev,int archivo){
 
 int main(int argc, char* argv[])
 {
-	FILE *fp= NULL;
-	FILE *fp1= NULL;	
-	
-
+	int fp;
 	pid_t process_id = 0;
 	pid_t sid = 0;
 	process_id = fork();
@@ -115,6 +136,11 @@ int main(int argc, char* argv[])
 		exit(0);
 	}
 	umask(0);
+	fp = open ("log_usb", O_WRONLY | O_CREAT, 0600);
+	if (fp == -1) {
+		printf("Error al abrir archivo");
+		exit(0);
+	}
 	sid = setsid();
 	if(sid < 0)
 	{
@@ -123,7 +149,9 @@ int main(int argc, char* argv[])
 	close(STDIN_FILENO);
 	close(STDOUT_FILENO);
 	close(STDERR_FILENO);
-	fp = fopen("log_usb.log", "w");
+	
+	
+	
 	while (1)
 	{	
 		printf("while");
@@ -131,13 +159,12 @@ int main(int argc, char* argv[])
 		udev = udev_new();
 		enumerar_disp_alm_masivo(udev,fp);
 		//aqui debe ir la funcion a usarse
-		//sleep(2);		
+		sleep(2);		
 		//fp1 = popen("top -bn2 | grep '%Cpu' | tail -1", "r");
 		//fread(buf,100,1, fp1);
 		//fwrite(buf, strlen(buf),1,fp);
 		//memset (buf,0,sizeof(char)*100);
 		
 	}
-	fclose(fp);
 	return (0);
 }
