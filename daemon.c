@@ -59,8 +59,8 @@ const char* direccion(const char *dir){
 
 void enumerar_disp_alm_masivo(struct udev* udev,int archivo){
 	printf("hola xD");
-	char * buf = (char *)malloc(sizeof(char)*100);
-	memset (buf,0,sizeof(char)*100);
+	char * buf = (char *)malloc(sizeof(char)*500);
+	memset (buf,0,sizeof(char)*500);
 	
 	struct udev_enumerate* enumerar = udev_enumerate_new(udev);
 
