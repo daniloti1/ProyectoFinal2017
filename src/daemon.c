@@ -9,6 +9,7 @@
 #include <errno.h>
 #include <syslog.h>
 #include <fcntl.h>
+#include "util.h"
 
 
 int main(int argc, char* argv[])
