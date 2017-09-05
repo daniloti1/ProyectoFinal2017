@@ -8,4 +8,5 @@ daemon: src/daemon.c libutil.so
 	gcc -Wall -I./include -L./lib src/daemon.c ./lib/libutil.so -o bin/daemon -ludev
 clean:
 	rm bin/*
-
+	rm obj/*
+	rm lib/*

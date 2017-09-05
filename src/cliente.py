@@ -1,8 +1,8 @@
+#!/usr/bin/python
 import json
 import requests
 import subprocess
 
-proceso = subprocess.Popen(["./bin/servidor"])
 
 def validacion():
     condicion = True
@@ -14,6 +14,8 @@ def validacion():
         except ValueError:
             print('Ingresa un numero')
     return ingreso
+
+proceso = subprocess.Popen(["./bin/servidor"])
 
 salir = True
 
@@ -29,7 +31,14 @@ while salir:
     opcion = validacion()
     if opcion == 1:
         print ("Listar Dispositivos")
-        
+	archivo = open("log_usb")
+
+	for i in range(9):
+		line = archivo.readline()
+		if ("no hay dispositivos conectado" not in line):
+			print(line)
+	print("No se encontraron mas dispositivos")
+        archivo.close()
 
     elif opcion == 2:
         print("Renombrar Archivos")
