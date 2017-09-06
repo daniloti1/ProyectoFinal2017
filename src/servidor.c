@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
 #include <string.h>
 #include <mntent.h>
 #include <libudev.h>
@@ -24,8 +26,14 @@ int answer_to_connection (void *cls, struct MHD_Connection *connection,
                           const char *upload_data,
                           size_t *upload_data_size, void **con_cls) 
 {
-  	const char *page  = "<html><body>Hello, browser!</body></html>";
+
+	//if (method == "GET") {
+
+
+  	const char *page  = "{ ‘solicitud’: ‘listar_dispositivos’, ‘dispositivos’: [ {‘nombre’: ...,‘id’: ‘vendor:device’,‘montaje’ : ‘/home/...’,‘nodo’: ‘/dev/...’}, { ...} ],‘status’: ..., ‘str_error’ : ...}";
 	printf("Answer to conection");
+
+	//MHD_get_connection_values (connection, MHD_HEADER_KIND, keyValueIterator,NULL);
 
 	struct MHD_Response *response;
   	int ret;

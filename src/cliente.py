@@ -39,9 +39,8 @@ while salir:
 	print("No se encontraron mas dispositivos")
         archivo.close()
 	url="http://127.0.0.1:8888/listar_dispositivos"
-	r=requests.get(url, json={"key": "value"})
-	dic=r.json()
-	print(dic)
+	#r=requests.get(url, json={"key": "value"})
+
 
     elif opcion == 2:
         print("Renombrar Archivos")
