@@ -20,6 +20,11 @@ Para en funcionamiento de este programa es necesario contar con las siguientes l
 
 3 - Uso general
 
+Tras compilar todo con make
+Se debe ejecutar bin/daemon
+Luego conectar el o los dispositivos USB
+Luego se ejecuta el bin/servidor
+Y finalmente el src/cliente.py
 
 
 4 - Autores
