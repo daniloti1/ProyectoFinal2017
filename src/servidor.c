@@ -25,6 +25,7 @@ int answer_to_connection (void *cls, struct MHD_Connection *connection,
                           size_t *upload_data_size, void **con_cls) 
 {
   	const char *page  = "<html><body>Hello, browser!</body></html>";
+	printf("Answer to conection");
 
 	struct MHD_Response *response;
   	int ret;

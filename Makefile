@@ -10,3 +10,5 @@ clean:
 	rm bin/*
 	rm obj/*
 	rm lib/*
+buscarDaemon:	
+	ps -A | grep " daemon"

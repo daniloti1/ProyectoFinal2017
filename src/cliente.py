@@ -27,18 +27,21 @@ while salir:
     print ("4. Escribir archivo")
     print ("5. Salir")
 
-    print ("Ingrese un numero")
     opcion = validacion()
     if opcion == 1:
-        print ("Listar Dispositivos")
+        print ("Listar Dispositivos")	
 	archivo = open("log_usb")
 
-	for i in range(9):
+	for i in range(4):
 		line = archivo.readline()
 		if ("no hay dispositivos conectado" not in line):
 			print(line)
 	print("No se encontraron mas dispositivos")
         archivo.close()
+	url="http://127.0.0.1:8888/listar_dispositivos"
+	r=requests.get(url, json={"key": "value"})
+	dic=r.json()
+	print(dic)
 
     elif opcion == 2:
         print("Renombrar Archivos")
@@ -57,5 +60,6 @@ while salir:
         salir = False
     else:
         print ("Ingrese un numero entre 1 y 5")
+    print ("")
 
 print ("Gracias por usar nuestro servicio xD")
